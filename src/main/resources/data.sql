@@ -8,7 +8,7 @@ insert into tb_product (name, description, price) values ('Ervilha', 'Ervilha em
 insert into tb_product (name, description, price) values ('Farinha de Milho', 'Farinha de milho para cuscuz', '1.55');
 insert into tb_product (name, description, price) values ('Farinha de Trigo', 'Farinha de trigo com fermento', '3.4');
 insert into tb_product (name, description, price) values ('Molho de Tomate', 'Molho de tomate sabor manjericão', '3.15');
-insert into tb_product (name, description, price) values ('Grão de Bico', 'Grão de bico tipo 1', '8.5);
+insert into tb_product (name, description, price) values ('Grão de Bico', 'Grão de bico tipo 1', '8.5');
 insert into tb_product (name, description, price) values ('Açúcar', 'Açúcar demerara', '2.1');
 
 insert into tb_client (name, address, installments_limit, credit_limit) values ('João da Silva', 'São Paulo, Brasil', 5, '500.0');

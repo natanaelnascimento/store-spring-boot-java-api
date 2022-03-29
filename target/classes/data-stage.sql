@@ -1,0 +1,1 @@
+insert into tb_user (name, username, password) values ('Administrador', 'admin', '$2y$10$hJFrs381fCjPnLb.qaeGLeKaM1UozbRr0k8BnS9SVCmtVV583uEam');
