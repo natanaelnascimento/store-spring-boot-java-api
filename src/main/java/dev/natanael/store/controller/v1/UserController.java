@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import dev.natanael.store.model.dto.UserCreationDTO;
 import dev.natanael.store.model.dto.UserResponseDTO;
+import dev.natanael.store.model.dto.UserUpdateDTO;
 import dev.natanael.store.model.entity.UserEntity;
 import dev.natanael.store.service.UserService;
 
@@ -60,7 +61,7 @@ public class UserController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserCreationDTO userDTO) {
+	public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO userDTO) {
 		UserEntity userEntity = modelMapper.map(userDTO, UserEntity.class);
 		userEntity.setId(id);
 		userService.update(userEntity);
