@@ -44,13 +44,13 @@ public class DiscountEntity {
 	@NotNull
 	@Positive
 	@Max(1)
-	@Column(nullable = false, precision = 19, scale = 2)
+	@Column(nullable = false, precision = 19, scale = 5)
 	private BigDecimal percentage;
 
 	@PrePersist
 	@PreUpdate
 	void scaleConfig() {
-		percentage = percentage.setScale(2, RoundingMode.HALF_UP);
+		percentage = percentage.setScale(5, RoundingMode.HALF_UP);
 	}
 
 }
