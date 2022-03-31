@@ -1,13 +1,16 @@
 package dev.natanael.store.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -18,12 +21,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
 import dev.natanael.store.StoreApplication;
+import dev.natanael.store.exception.IncorrectPasswordException;
+import dev.natanael.store.exception.SessionUserDeleteException;
 import dev.natanael.store.model.entity.UserEntity;
+import dev.natanael.store.repository.UserRepository;
+import dev.natanael.store.repository.UserSessionRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -33,10 +40,16 @@ import dev.natanael.store.model.entity.UserEntity;
 public class UserServiceTest {
 
 	@Autowired
+	private UserRepository userRepository;
+
+	@Autowired
+	private UserSessionRepository userSessionRepository;
+
+	@Autowired
 	private UserService userService;
 
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private AuthenticationService authenticationService;
 
 	private List<UserEntity> userEntities = new ArrayList<UserEntity>();
 
@@ -46,7 +59,7 @@ public class UserServiceTest {
 		UserEntity userEntity = new UserEntity();
 		userEntity.setName("Test User 1");
 		userEntity.setUsername("user1");
-		userEntity.setPassword(passwordEncoder.encode("user1"));
+		userEntity.setPassword("user1");
 		userEntity = userService.create(userEntity);
 		userEntities.add(userEntity);
 		assertNotNull(userEntity);
@@ -55,11 +68,14 @@ public class UserServiceTest {
 		userEntity = new UserEntity();
 		userEntity.setName("Test User 2");
 		userEntity.setUsername("user2");
-		userEntity.setPassword(passwordEncoder.encode("user2"));
+		userEntity.setPassword("user2");
 		userEntity = userService.create(userEntity);
 		userEntities.add(userEntity);
 		assertNotNull(userEntity);
 		assertNotNull(userEntity.getId());
+
+		// Authentication
+		authenticationService.login(new UsernamePasswordAuthenticationToken("user1", "user1"));
 	}
 
 	@Test
@@ -130,16 +146,43 @@ public class UserServiceTest {
 
 	@Test
 	@Order(8)
-	public void delete() {
+	public void changePassword_incorrectPasswordException() {
+		assertThrows(IncorrectPasswordException.class, () -> {
+			userService.changePassword("user3", "user2");
+		});
+	}
+
+	@Test
+	@Order(9)
+	public void changePassword() {
+		userService.changePassword("user1", "user2");
+		assertDoesNotThrow(() -> {
+			authenticationService.login(new UsernamePasswordAuthenticationToken("user1", "user2"));
+		});
+	}
+
+	@Test
+	@Order(10)
+	public void delete_sessionUserDeleteException() {
 		UserEntity userEntity = this.userEntities.get(0);
+		assertThrows(SessionUserDeleteException.class, () ->{
+			userService.delete(userEntity);
+		});
+	}
+
+	@Test
+	@Order(11)
+	public void delete() {
+		UserEntity userEntity = this.userEntities.get(1);
 		userService.delete(userEntity);
 		Page<UserEntity> userEntities = userService.findAll(Pageable.unpaged());
 		assertEquals(1, userEntities.getSize());
+	}
 
-		userEntity = this.userEntities.get(1);
-		userService.delete(userEntity);
-		userEntities = userService.findAll(Pageable.unpaged());
-		assertEquals(0, userEntities.getSize());
+	@AfterAll
+	private void tearDown() {
+		userSessionRepository.deleteAll();
+		userRepository.deleteAll();
 	}
 
 }

@@ -61,14 +61,14 @@ public class UserSessionServiceTest {
 		UserEntity userEntity = new UserEntity();
 		userEntity.setName("Test User 1");
 		userEntity.setUsername("user1");
-		userEntity.setPassword(passwordEncoder.encode("user1"));
+		userEntity.setPassword("user1");
 		userEntity = userService.create(userEntity);
 		userEntities.add(userEntity);
 
 		userEntity = new UserEntity();
 		userEntity.setName("Test User 2");
 		userEntity.setUsername("user2");
-		userEntity.setPassword(passwordEncoder.encode("user2"));
+		userEntity.setPassword("user2");
 		userEntity = userService.create(userEntity);
 		userEntities.add(userEntity);
 	}

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.natanael.store.model.dto.PasswordChangeDTO;
 import dev.natanael.store.model.dto.UserCreationDTO;
 import dev.natanael.store.model.dto.UserResponseDTO;
 import dev.natanael.store.model.dto.UserUpdateDTO;
@@ -65,6 +66,12 @@ public class UserController {
 		UserEntity userEntity = modelMapper.map(userDTO, UserEntity.class);
 		userEntity.setId(id);
 		userService.update(userEntity);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@PutMapping("/password")
+	public ResponseEntity<UserResponseDTO> changePassword(@RequestBody PasswordChangeDTO userDTO) {
+		userService.changePassword(userDTO.getCurrentPassword(), userDTO.getNewPassword());
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 

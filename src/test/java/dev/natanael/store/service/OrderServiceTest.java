@@ -11,7 +11,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -41,7 +40,6 @@ import dev.natanael.store.model.entity.OrderEntity;
 import dev.natanael.store.model.entity.OrderItemEntity;
 import dev.natanael.store.model.entity.ProductEntity;
 import dev.natanael.store.model.entity.UserEntity;
-import dev.natanael.store.model.entity.UserSessionEntity;
 import dev.natanael.store.repository.ClientRepository;
 import dev.natanael.store.repository.DiscountRepository;
 import dev.natanael.store.repository.OfficeHourRepository;
@@ -49,7 +47,6 @@ import dev.natanael.store.repository.OrderRepository;
 import dev.natanael.store.repository.ProductRepository;
 import dev.natanael.store.repository.UserRepository;
 import dev.natanael.store.repository.UserSessionRepository;
-import dev.natanael.store.util.UserSessionContext;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -69,16 +66,10 @@ public class OrderServiceTest {
 	@Autowired private ProductService productService;
 	@Autowired private ClientService clientService;
 	@Autowired private UserService userService;
-	@Autowired private UserSessionService userSessionService;
+	@Autowired private AuthenticationService authenticationService;
 	@Autowired private DiscountService discountService;
 	@Autowired private OfficeHourService officeHourService;
 	@Autowired private OrderService orderService;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private UserSessionContext userContext;
 
 	private List<OrderEntity> orderEntities = new ArrayList<>();
 	private List<ClientEntity> clientEntities = new ArrayList<>();
@@ -91,24 +82,19 @@ public class OrderServiceTest {
 		UserEntity userEntity = new UserEntity();
 		userEntity.setName("Test User 1");
 		userEntity.setUsername("user1");
-		userEntity.setPassword(passwordEncoder.encode("user1"));
+		userEntity.setPassword("user1");
 		userEntity = userService.create(userEntity);
 		userEntities.add(userEntity);
 		
 		userEntity = new UserEntity();
 		userEntity.setName("Test User 2");
 		userEntity.setUsername("user2");
-		userEntity.setPassword(passwordEncoder.encode("user2"));
+		userEntity.setPassword("user2");
 		userEntity = userService.create(userEntity);
 		userEntities.add(userEntity);
 
-		UserSessionEntity userSessionEntity = new UserSessionEntity();
-		userSessionEntity.setUser(userEntity);
-		userSessionEntity.setAccessTokenSecret(passwordEncoder.encode(UUID.randomUUID().toString()));
-		userSessionEntity.setRefreshTokenSecret(passwordEncoder.encode(UUID.randomUUID().toString()));
-		userSessionEntity.setRefreshTokenSecret(passwordEncoder.encode(UUID.randomUUID().toString()));
-		userSessionEntity = userSessionService.create(userSessionEntity);
-		userContext.setUserSession(userSessionEntity);
+		// Authentication
+		authenticationService.login(new UsernamePasswordAuthenticationToken("user2", "user2"));
 
 		// Discount
 		DiscountEntity discountEntity = new DiscountEntity();
