@@ -49,7 +49,7 @@ public class DiscountController {
 	}
 
 	@GetMapping
-	public Page<DiscountResponseDTO> find(@PageableDefault(sort = {"name"}) Pageable pageable) {
+	public Page<DiscountResponseDTO> find(@PageableDefault(sort = {"description"}) Pageable pageable) {
 		Page<DiscountEntity> discountEntities = discountService.findAll(pageable);
 		return discountEntities.map(c -> modelMapper.map(c, DiscountResponseDTO.class));
 	}
