@@ -43,14 +43,14 @@ public class OfficeHourController {
 	}
 
 	@GetMapping("/byDayOfWeek/{dayOfWeek}")
-	public Page<OfficeHourResponseDTO> findById(@PathVariable Integer dayOfWeek,
-			@PageableDefault(page = 1, size = 10, sort = {"startTime"}) Pageable pageable) {
+	public Page<OfficeHourResponseDTO> findByDayOfWeek(@PathVariable Integer dayOfWeek,
+			@PageableDefault(sort = {"startTime", "endTime"}) Pageable pageable) {
 		Page<OfficeHourEntity> officeHourEntities = officeHourService.findByDayOfWeek(dayOfWeek, pageable);
 		return officeHourEntities.map(c -> modelMapper.map(c, OfficeHourResponseDTO.class));
 	}
 
 	@GetMapping
-	public Page<OfficeHourResponseDTO> find(@PageableDefault(sort = {"name"}) Pageable pageable) {
+	public Page<OfficeHourResponseDTO> find(@PageableDefault(sort = {"dayOfWeek", "startTime", "endTime"}) Pageable pageable) {
 		Page<OfficeHourEntity> officeHourEntities = officeHourService.findAll(pageable);
 		return officeHourEntities.map(c -> modelMapper.map(c, OfficeHourResponseDTO.class));
 	}
